@@ -14,13 +14,19 @@
 
 FROM grpcweb/common
 
-ARG EXAMPLE_DIR=/github/grpc-web/net/grpc/gateway/examples/echo
+ARG EXAMPLE_DIR=net/grpc/gateway/examples/echo
+
+ADD $EXAMPLE_DIR $EXAMPLE_DIR
+
+RUN npm config set registry https://registry.npm.taobao.org
 
 RUN protoc -I=$EXAMPLE_DIR echo.proto \
 --js_out=import_style=commonjs:\
 $EXAMPLE_DIR/commonjs-example \
---grpc-web_out=import_style=commonjs,mode=grpcwebtext:\
+--grpc-web_out=import_style=commonjs,mode=grpcweb:\
 $EXAMPLE_DIR/commonjs-example
+
+ENV name nightgo
 
 RUN cd $EXAMPLE_DIR/commonjs-example && \
   npm install && \
