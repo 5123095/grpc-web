@@ -1,20 +1,4 @@
-/*
- *
- * Copyright 2018 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+var FCClient = require('@alicloud/fc2');
 
 var PROTO_PATH = __dirname + '/../echo.proto';
 
@@ -32,6 +16,11 @@ var packageDefinition = protoLoader.loadSync(
     });
 var protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
 var echo = protoDescriptor.grpc.gateway.testing;
+const client = new FCClient('1273211582724531', {
+    accessKeyID: 'LTAIphGdjfU9di6m',
+    accessKeySecret: '7CzQ5SR01RS0wUzCF4Mvc2RsGSfMMm',
+    region: 'cn-hangzhou',
+});
 
 /**
  * @param {!Object} call
@@ -51,9 +40,11 @@ function copyMetadata(call) {
  * @param {function():?} callback
  */
 function doEcho(call, callback) {
-  callback(null, {
-    message: call.request.message
-  }, copyMetadata(call));
+  client.invokeFunction("image", call.request.message, null).then(res=>{
+      callback(null, {
+          message: res.data
+      }, copyMetadata(call));
+  });
 }
 
 /**

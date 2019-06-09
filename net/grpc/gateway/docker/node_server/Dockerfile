@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM grpcweb/common
+FROM node:8-stretch
 
-RUN cd /github/grpc-web/net/grpc/gateway/examples/echo/node-server && \
+ARG EXAMPLE_DIR=net/grpc/gateway/examples/echo
+
+ADD $EXAMPLE_DIR $EXAMPLE_DIR
+
+RUN npm config set registry https://registry.npm.taobao.org
+
+RUN cd $EXAMPLE_DIR/node-server && \
   npm install
 
 EXPOSE 9090
-CMD ["node", "/github/grpc-web/net/grpc/gateway/examples/echo/node-server/server.js"]
+CMD ["node", "net/grpc/gateway/examples/echo/node-server/server.js"]
