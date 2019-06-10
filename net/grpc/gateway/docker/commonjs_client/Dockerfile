@@ -20,7 +20,7 @@ ADD $EXAMPLE_DIR $EXAMPLE_DIR
 
 RUN npm config set registry https://registry.npm.taobao.org
 
-RUN protoc -I=$EXAMPLE_DIR echo.proto \
+RUN protoc -I=$EXAMPLE_DIR gateway.proto \
 --js_out=import_style=commonjs:\
 $EXAMPLE_DIR/commonjs-example \
 --grpc-web_out=import_style=commonjs,mode=grpcweb:\

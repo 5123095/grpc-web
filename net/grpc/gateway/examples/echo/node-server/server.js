@@ -1,6 +1,6 @@
 var FCClient = require('@alicloud/fc2');
 
-var PROTO_PATH = __dirname + '/../echo.proto';
+var PROTO_PATH = __dirname + '/../gateway.proto';
 
 var async = require('async');
 var _ = require('lodash');
@@ -15,7 +15,7 @@ var packageDefinition = protoLoader.loadSync(
      oneofs: true
     });
 var protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
-var echo = protoDescriptor.grpc.gateway.testing;
+var echo = protoDescriptor.nemofang.gateway.v1;
 const client = new FCClient('1273211582724531', {
     accessKeyID: 'LTAIphGdjfU9di6m',
     accessKeySecret: '7CzQ5SR01RS0wUzCF4Mvc2RsGSfMMm',
@@ -39,43 +39,11 @@ function copyMetadata(call) {
  * @param {!Object} call
  * @param {function():?} callback
  */
-function doEcho(call, callback) {
-  client.invokeFunction("image", call.request.message, null).then(res=>{
+function doPassThrough(call, callback) {
+  client.invokeFunction(call.request.service_name, call.request.func_name, call.request.event).then(res=>{
       callback(null, {
           message: res.data
       }, copyMetadata(call));
-  });
-}
-
-/**
- * @param {!Object} call
- * @param {function():?} callback
- */
-function doEchoAbort(call, callback) {
-  callback({
-    code: grpc.status.ABORTED,
-    message: 'Aborted from server side.'
-  });
-}
-
-/**
- * @param {!Object} call
- */
-function doServerStreamingEcho(call) {
-  var senders = [];
-  function sender(message, interval) {
-    return (callback) => {
-      call.write({
-        message: message
-      });
-      _.delay(callback, interval);
-    };
-  }
-  for (var i = 0; i < call.request.message_count; i++) {
-    senders[i] = sender(call.request.message, call.request.message_interval);
-  }
-  async.series(senders, () => {
-    call.end(copyMetadata(call));
   });
 }
 
@@ -87,9 +55,7 @@ function doServerStreamingEcho(call) {
 function getServer() {
   var server = new grpc.Server();
   server.addService(echo.EchoService.service, {
-    echo: doEcho,
-    echoAbort: doEchoAbort,
-    serverStreamingEcho: doServerStreamingEcho,
+      passThrough: doPassThrough
   });
   return server;
 }
