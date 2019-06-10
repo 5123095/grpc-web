@@ -16,20 +16,18 @@
  *
  */
 
-const {EchoRequest,
-       ServerStreamingEchoRequest} = require('./echo_pb.js');
-const {EchoServiceClient} = require('./echo_grpc_web_pb.js');
+const {PassThroughRequest} = require('./gateway_pb.js');
+const {GatewayServiceClient} = require('./gateway_grpc_web_pb.js');
 const {EchoApp} = require('../echoapp.js');
 const grpc = {};
 grpc.web = require('grpc-web');
 
-var echoService = new EchoServiceClient('http://dkjian.com:9001', null, null);
+var echoService = new GatewayServiceClient('http://dkjian.com:9001', null, null);
 
 var echoApp = new EchoApp(
   echoService,
   {
-    EchoRequest: EchoRequest,
-    ServerStreamingEchoRequest: ServerStreamingEchoRequest
+    EchoRequest: GatewayServiceClient
   },
   {
     checkGrpcStatusCode: function(status) {

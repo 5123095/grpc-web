@@ -63,7 +63,8 @@ echoapp.EchoApp.addRightMessage = function(message) {
 echoapp.EchoApp.prototype.echo = function(msg) {
   echoapp.EchoApp.addLeftMessage(msg);
   var unaryRequest = new this.ctors.EchoRequest();
-  unaryRequest.setMessage(msg);
+  unaryRequest.setServiceName(msg);
+  unaryRequest.setServiceName(msg);
   var self = this;
   var call = this.echoService.echo(unaryRequest,
                                    {"custom-header-1": "value1"},

@@ -40,7 +40,7 @@ function copyMetadata(call) {
  * @param {function():?} callback
  */
 function doPassThrough(call, callback) {
-  client.invokeFunction(call.request.service_name, call.request.func_name, call.request.event).then(res=>{
+  client.invokeFunction(call.request.serviceName, call.request.funcName, call.request.event).then(res=>{
       callback(null, {
           message: res.data
       }, copyMetadata(call));
