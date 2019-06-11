@@ -27,7 +27,7 @@ var echoService = new GatewayServiceClient('http://dkjian.com:9001', null, null)
 var echoApp = new EchoApp(
   echoService,
   {
-    EchoRequest: GatewayServiceClient
+      PassThroughRequest
   },
   {
     checkGrpcStatusCode: function(status) {

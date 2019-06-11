@@ -62,11 +62,12 @@ echoapp.EchoApp.addRightMessage = function(message) {
  */
 echoapp.EchoApp.prototype.echo = function(msg) {
   echoapp.EchoApp.addLeftMessage(msg);
-  var unaryRequest = new this.ctors.EchoRequest();
-  unaryRequest.setServiceName(msg);
-  unaryRequest.setServiceName(msg);
+  var unaryRequest = new this.ctors.PassThroughRequest();
+  unaryRequest.setServiceName("image");
+  unaryRequest.setFuncName(msg);
+  unaryRequest.setEvent("{\"image\":\"image\"}");
   var self = this;
-  var call = this.echoService.echo(unaryRequest,
+  var call = this.echoService.passThrough(unaryRequest,
                                    {"custom-header-1": "value1"},
                                    function(err, response) {
     if (err) {

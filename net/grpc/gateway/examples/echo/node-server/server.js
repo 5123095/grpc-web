@@ -40,11 +40,16 @@ function copyMetadata(call) {
  * @param {function():?} callback
  */
 function doPassThrough(call, callback) {
-  client.invokeFunction(call.request.serviceName, call.request.funcName, call.request.event).then(res=>{
-      callback(null, {
-          message: res.data
+  try{
+      client.invokeFunction(call.request.service_name, call.request.func_name, call.request.event).then(res=>{
+          callback(null, {
+              data: res.data
+          }, copyMetadata(call));
+      });
+  }catch (e) {
+      callback(e, {
       }, copyMetadata(call));
-  });
+  }
 }
 
 /**
@@ -54,7 +59,7 @@ function doPassThrough(call, callback) {
  */
 function getServer() {
   var server = new grpc.Server();
-  server.addService(echo.EchoService.service, {
+  server.addService(echo.GatewayService.service, {
       passThrough: doPassThrough
   });
   return server;
