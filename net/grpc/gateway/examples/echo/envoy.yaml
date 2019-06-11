@@ -34,10 +34,6 @@ static_resources:
                 enabled: true
           http_filters:
           - name: envoy.grpc_web
-            config:
-              buffer:
-                max_request_bytes: 20000000
-                max_request_time: 60
           - name: envoy.cors
           - name: envoy.router
   clusters:

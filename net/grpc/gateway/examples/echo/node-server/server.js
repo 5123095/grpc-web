@@ -59,7 +59,7 @@ function doPassThrough(call, callback) {
  * @return {!Server} The new server object
  */
 function getServer() {
-  var server = new grpc.Server();
+  var server = new grpc.Server({"grpc.max_send_message_length": 1024*1024*1024, "grpc.max_receive_message_length":1024*1024*1024});
   server.addService(echo.GatewayService.service, {
       passThrough: doPassThrough
   });
