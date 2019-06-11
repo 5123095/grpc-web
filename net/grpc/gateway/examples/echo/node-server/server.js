@@ -47,6 +47,7 @@ function doPassThrough(call, callback) {
           }, copyMetadata(call));
       });
   }catch (e) {
+      console.log(e);
       callback(e, {
       }, copyMetadata(call));
   }
