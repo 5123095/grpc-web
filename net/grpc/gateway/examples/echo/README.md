@@ -26,8 +26,7 @@ This compiles the gRPC backend server, written in Node, and listens on port
 9090.
 
 ```sh
-$ docker build -t grpcweb/node-server \
-  -f net/grpc/gateway/docker/node_server/Dockerfile .
+$ docker build -t registry.cn-hangzhou.aliyuncs.com/dkjian/gateway -f net/grpc/gateway/docker/node_server/Dockerfile .
 $ docker run -d -p 9090:9090 --name node-server grpcweb/node-server
 ```
 
@@ -48,8 +47,7 @@ This steps compiles the front-end gRPC-Web client into a static .JS file, and
 we use a simple server to serve up the JS/HTML static contents.
 
 ```sh
-$ docker build -t grpcweb/commonjs-client  \
-  -f net/grpc/gateway/docker/commonjs_client/Dockerfile .
+$ docker build -t grpcweb/commonjs-client -f net/grpc/gateway/docker/commonjs_client/Dockerfile .
 $ docker run -d -p 8081:8081 grpcweb/commonjs-client
 ```
 

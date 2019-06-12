@@ -40,7 +40,7 @@ function copyMetadata(call) {
  * @param {!Object} call
  * @param {function():?} callback
  */
-async function doPassThrough(call, callback) {
+async function doStream(call, callback) {
   try{
       let max = 6000000;
       let offset = 0;
@@ -54,7 +54,7 @@ async function doPassThrough(call, callback) {
           let buffer = new Uint8Array(requestId.length + offsetString.length + curSize);
           buffer.set(requestId, 0);
           buffer.set(offsetString, requestId.length);
-          buffer.set(call.request.event.slice(offset, curSize), requestId.length + offsetString.length);
+          buffer.set(call.request.event.slice(offset, offset+curSize), requestId.length + offsetString.length);
           offset += curSize;
           res = await client.invokeFunction(call.request.service_name, call.request.func_name, Buffer.from(buffer));
       }
@@ -69,6 +69,23 @@ async function doPassThrough(call, callback) {
 }
 
 /**
+ * @param {!Object} call
+ * @param {function():?} callback
+ */
+async function doRequest(call, callback) {
+    try{
+        let res = await client.invokeFunction(call.request.service_name, call.request.func_name, call.request.event);
+        callback(null, {
+            data: res.data
+        }, copyMetadata(call));
+    }catch (e) {
+        console.log(e);
+        callback(e, {
+        }, copyMetadata(call));
+    }
+}
+
+/**
  * Get a new server with the handler functions in this file bound to the methods
  * it serves.
  * @return {!Server} The new server object
@@ -76,7 +93,8 @@ async function doPassThrough(call, callback) {
 function getServer() {
   var server = new grpc.Server({"grpc.max_send_message_length": 1024*1024*1024, "grpc.max_receive_message_length":1024*1024*1024});
   server.addService(echo.GatewayService.service, {
-      passThrough: doPassThrough
+      stream: doStream,
+      request: doRequest
   });
   return server;
 }
