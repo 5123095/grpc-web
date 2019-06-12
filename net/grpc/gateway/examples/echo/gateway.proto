@@ -2,16 +2,23 @@ syntax = "proto3";
 
 package nemofang.gateway.v1;
 
-message PassThroughRequest {
+message StreamRequest {
+  string service_name = 1;
+  string func_name = 2;
+  bytes event = 3;
+}
+
+message Response {
+  string data = 1;
+}
+
+message Request {
   string service_name = 1;
   string func_name = 2;
   string event = 3;
 }
 
-message PassThroughResponse {
-  string data = 1;
-}
-
 service GatewayService {
-  rpc PassThrough(PassThroughRequest) returns (PassThroughResponse);
+  rpc stream(StreamRequest) returns (Response);
+  rpc request(Request) returns (Response);
 }

@@ -6,6 +6,7 @@ var async = require('async');
 var _ = require('lodash');
 var grpc = require('grpc');
 var protoLoader = require('@grpc/proto-loader');
+var {TextEncoder} = require('./TextEncoder');
 var packageDefinition = protoLoader.loadSync(
     PROTO_PATH,
     {keepCase: true,
@@ -39,13 +40,27 @@ function copyMetadata(call) {
  * @param {!Object} call
  * @param {function():?} callback
  */
-function doPassThrough(call, callback) {
+async function doPassThrough(call, callback) {
   try{
-      client.invokeFunction(call.request.service_name, call.request.func_name, call.request.event).then(res=>{
-          callback(null, {
-              data: res.data
-          }, copyMetadata(call));
-      });
+      let max = 6000000;
+      let offset = 0;
+      let eventSize = call.request.event.length;
+      const encoder = new TextEncoder("utf-8");
+      let requestId =  encoder.encode((""+(Math.random()*1000000000<<0)).padEnd(9, "0"));
+      let res;
+      while(offset < eventSize){
+          let offsetString = encoder.encode((""+offset).padStart(9, "0"));
+          let curSize = Math.min(eventSize, max);
+          let buffer = new Uint8Array(requestId.length + offsetString.length + curSize);
+          buffer.set(requestId, 0);
+          buffer.set(offsetString, requestId.length);
+          buffer.set(call.request.event.slice(offset, curSize), requestId.length + offsetString.length);
+          offset += curSize;
+          res = await client.invokeFunction(call.request.service_name, call.request.func_name, Buffer.from(buffer));
+      }
+      callback(null, {
+          data: res.data
+      }, copyMetadata(call));
   }catch (e) {
       console.log(e);
       callback(e, {
