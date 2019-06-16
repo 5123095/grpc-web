@@ -75,12 +75,23 @@ async function doStream(call, callback) {
 async function doRequest(call, callback) {
     try{
         let res = await client.invokeFunction(call.request.service_name, call.request.func_name, call.request.event);
-        callback(null, {
-            data: res.data
-        }, copyMetadata(call));
+        console.log("--------res", res);
+        if(res.headers["x-fc-error-type"]){
+            let message = res.data.errorMessage.split(": ");
+            callback({
+                code: message[0],
+                message: decodeURIComponent(message[1])
+            });
+        }else{
+            callback(null, {
+                data: res.data
+            }, copyMetadata(call));
+        }
     }catch (e) {
-        console.log(e);
-        callback(e, {
+        callback({
+            code: grpc.status.INVALID_ARGUMENT,
+            message: e.message,
+        }, {
         }, copyMetadata(call));
     }
 }
