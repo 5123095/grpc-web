@@ -79,7 +79,7 @@ async function doRequest(call, callback) {
         if(res.headers["x-fc-error-type"]){
             let message = res.data.errorMessage.split(": ");
             callback({
-                code: message[0],
+                code: grpc.status[message[0]],
                 message: decodeURIComponent(message[1])
             });
         }else{
